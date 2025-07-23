@@ -1,0 +1,7 @@
+requests
+pytest
+pyyaml
+openai
+pydantic
+python-dotenv
+google-generativeai
