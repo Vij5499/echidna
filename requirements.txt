@@ -1,7 +1,8 @@
-requests
-pytest
-pyyaml
-openai
-pydantic
-python-dotenv
 google-generativeai
+pydantic
+pytest
+requests
+PyYAML
+flask
+dataclasses
+python-dotenv

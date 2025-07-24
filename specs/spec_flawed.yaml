@@ -1,0 +1,62 @@
+openapi: 3.0.0
+info:
+  title: User Management API
+  version: 1.0.0
+  description: API for managing users (intentionally flawed for learning)
+
+servers:
+  - url: http://localhost:5000
+    description: Development server
+
+paths:
+  /users:
+    post:
+      summary: Create a new user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: User's full name
+                username:
+                  type: string
+                  description: User's username
+                email:
+                  type: string
+                  format: email
+                  description: User's email (deliberately not marked as required)
+              required:
+                - name
+                - username
+                # email is deliberately missing from required array
+                # This is the "flaw" the agent should learn to fix
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  username:
+                    type: string
+                  email:
+                    type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string

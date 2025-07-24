@@ -1,10 +1,10 @@
 openapi: 3.0.0
 info:
-  title: Flawed User API
+  title: Flawed LOCAL User API
   version: 1.0.0
-  description: An API to create users.
+  description: An API to create users that is missing 'email' in its spec.
 servers:
-  - url: https://jsonplaceholder.typicode.com
+  - url: http://127.0.0.1:5000
 paths:
   /users:
     post:

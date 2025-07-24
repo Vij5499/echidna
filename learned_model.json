@@ -1,0 +1,17 @@
+{
+  "total_constraints": 1,
+  "constraints": {
+    "/users_email_required_field": {
+      "rule_description": "The 'email' field is required for POST requests to /users.",
+      "constraint_type": "required_field",
+      "affected_parameter": "email",
+      "endpoint_path": "/users",
+      "confidence_score": 1.0,
+      "success_count": 3,
+      "failure_count": 0
+    }
+  },
+  "endpoint_coverage": [
+    "/users"
+  ]
+}
