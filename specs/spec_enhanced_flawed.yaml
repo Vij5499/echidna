@@ -1,0 +1,78 @@
+# specs/spec_enhanced_flawed.yaml
+openapi: 3.0.0
+info:
+  title: Enhanced User Management API
+  version: 1.0.0
+  description: API with sophisticated constraints (intentionally incomplete spec)
+
+servers:
+  - url: http://localhost:5000
+
+paths:
+  /users:
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                username:
+                  type: string
+                account_type:
+                  type: string
+                  enum: [basic, premium]
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                contact_type:
+                  type: string
+                  enum: [email, phone]
+                age:
+                  type: integer
+              required:
+                - name
+                - username
+              # INTENTIONALLY MISSING:
+              # - Conditional requirement: email when account_type=premium
+              # - Mutual exclusivity: email OR phone
+              # - Format dependency: email format when contact_type=email  
+              # - Business rule: age >= 18
+              # - Business rule: username pattern
+      responses:
+        '201':
+          description: User created successfully
+        '400':
+          description: Bad request
+
+  /orders:
+    post:
+      summary: Create an order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payment_method:
+                  type: string
+                  enum: [cash, credit_card, debit_card]
+                billing_address:
+                  type: string
+                total_amount:
+                  type: number
+              # INTENTIONALLY MISSING:
+              # - Conditional requirement: billing_address when payment_method=credit_card
+              # - Business rule: total_amount > 0
+      responses:
+        '201':
+          description: Order created successfully
+        '400':
+          description: Bad request

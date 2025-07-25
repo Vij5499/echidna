@@ -1,13 +1,22 @@
 {
-  "total_constraints": 1,
+  "total_constraints": 2,
   "constraints": {
-    "/users_email_required_field": {
-      "rule_description": "The 'email' field is required for POST requests to /users.",
-      "constraint_type": "required_field",
-      "affected_parameter": "email",
+    "/users_contact_method_mutual_exclusivity_excl_email_phone": {
+      "rule_description": "At least one contact method (email or phone) must be provided when creating a user.",
+      "constraint_type": "mutual_exclusivity",
+      "affected_parameter": "contact_method",
       "endpoint_path": "/users",
-      "confidence_score": 1.0,
-      "success_count": 3,
+      "confidence_score": 0.95,
+      "success_count": 0,
+      "failure_count": 0
+    },
+    "/users_user_creation_request_rate_limiting": {
+      "rule_description": "Limits the rate of user creation requests to a maximum of 3 requests per minute.",
+      "constraint_type": "rate_limiting",
+      "affected_parameter": "user_creation_request",
+      "endpoint_path": "/users",
+      "confidence_score": 0.95,
+      "success_count": 0,
       "failure_count": 0
     }
   },
