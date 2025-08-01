@@ -1,0 +1,108 @@
+# specs/spec_multi_endpoint.yaml
+openapi: 3.0.0
+info:
+  title: Multi-Endpoint API for Constraint Testing
+  version: 1.0.0
+  description: API with multiple endpoints for testing different constraint types
+
+servers:
+  - url: http://localhost:5000
+
+paths:
+  /users:
+    post:
+      summary: Create a new user (with rate limiting)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                age:
+                  type: integer
+              required:
+                - name
+                - username
+      responses:
+        '201':
+          description: User created successfully
+        '400':
+          description: Bad request
+        '429':
+          description: Rate limit exceeded
+
+  /profiles:
+    post:
+      summary: Create a profile (required field testing)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                bio:
+                  type: string
+              # INTENTIONALLY MISSING: username as required
+      responses:
+        '201':
+          description: Profile created successfully
+        '400':
+          description: Bad request
+
+  /products:
+    post:
+      summary: Create a product (format validation testing)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                contact_email:
+                  type: string
+              # INTENTIONALLY MISSING: email format validation
+      responses:
+        '201':
+          description: Product created successfully
+        '400':
+          description: Bad request
+
+  /orders:
+    post:
+      summary: Create an order (conditional requirement testing)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payment_method:
+                  type: string
+                  enum: [cash, credit_card, debit_card]
+                billing_address:
+                  type: string
+                total_amount:
+                  type: number
+              # INTENTIONALLY MISSING: billing_address required when payment_method=credit_card
+      responses:
+        '201':
+          description: Order created successfully
+        '400':
+          description: Bad request

@@ -1,0 +1,102 @@
+{
+  "execution_summary": {
+    "total_time": 94.96370649337769,
+    "timestamp": "2025-08-01T12:41:39.037941",
+    "test_categories": 3
+  },
+  "detailed_results": {
+    "constraint_types": {
+      "Required Field": {
+        "success": false,
+        "constraint_learned": false,
+        "any_constraint_learned": true,
+        "execution_time": 1.530348300933838,
+        "expected_type": "required_field"
+      },
+      "Format Validation": {
+        "success": false,
+        "constraint_learned": false,
+        "any_constraint_learned": false,
+        "execution_time": 1.5219061374664307,
+        "expected_type": "format_validation"
+      },
+      "Conditional Requirement": {
+        "success": false,
+        "constraint_learned": false,
+        "any_constraint_learned": false,
+        "execution_time": 1.5441358089447021,
+        "expected_type": "conditional_requirement"
+      },
+      "Mutual Exclusivity": {
+        "success": false,
+        "constraint_learned": false,
+        "any_constraint_learned": false,
+        "execution_time": 1.5552880764007568,
+        "expected_type": "mutual_exclusivity"
+      },
+      "Format Dependency": {
+        "success": false,
+        "constraint_learned": false,
+        "any_constraint_learned": false,
+        "execution_time": 1.8322834968566895,
+        "expected_type": "format_dependency"
+      },
+      "Business Rule": {
+        "success": false,
+        "constraint_learned": false,
+        "any_constraint_learned": false,
+        "execution_time": 1.4856019020080566,
+        "expected_type": "business_rule"
+      },
+      "Value Constraint": {
+        "success": false,
+        "constraint_learned": false,
+        "any_constraint_learned": false,
+        "execution_time": 1.5324115753173828,
+        "expected_type": "value_constraint"
+      },
+      "Rate Limiting": {
+        "success": false,
+        "constraint_learned": false,
+        "any_constraint_learned": false,
+        "execution_time": 1.509345293045044,
+        "expected_type": "rate_limiting"
+      }
+    },
+    "edge_cases": {
+      "Empty API Spec": true,
+      "Malformed JSON Response": true,
+      "Unicode Error Messages": true,
+      "Extremely Long Error Message": true,
+      "Nested Error Structure": true
+    },
+    "regression": {
+      "test_error_handling.py": {
+        "success": true,
+        "execution_time": 0.3965277671813965,
+        "output": "",
+        "errors": ""
+      },
+      "test_integration_failures.py": {
+        "success": true,
+        "execution_time": 1.6413416862487793,
+        "output": "",
+        "errors": ""
+      },
+      "test_stress_and_performance.py": {
+        "success": true,
+        "execution_time": 0.3987307548522949,
+        "output": "",
+        "errors": ""
+      }
+    }
+  },
+  "recommendations": [
+    {
+      "category": "constraint_learning",
+      "priority": "high",
+      "issue": "Failed to learn: Required Field, Format Validation, Conditional Requirement, Mutual Exclusivity, Format Dependency, Business Rule, Value Constraint, Rate Limiting",
+      "suggestion": "Review interpreter prompts and constraint detection logic"
+    }
+  ]
+}

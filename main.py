@@ -335,6 +335,19 @@ def generate_test_script_with_error_handling(spec_data, user_prompt, constraint_
     """Generate test script with comprehensive error handling"""
     try:
         return generate_test_script(spec_data, user_prompt, constraint_model)
+    except TimeoutError as e:
+        error = AdaptiveError(
+            f"Test script generation timed out: {e}",
+            ErrorType.LLM_FAILURE,
+            ErrorSeverity.HIGH,
+            context={'prompt': user_prompt, 'task': 'test_generation', 'timeout': True}
+        )
+        recovery_result = error_handler.handle_error(error)
+        
+        if recovery_result and recovery_result != "DEGRADED_MODE":
+            return {'script': recovery_result, 'user_prompt': user_prompt, 'enhanced_spec_used': False}
+        else:
+            return {'error': f"Timeout: {str(e)}", 'user_prompt': user_prompt}
     except Exception as e:
         error = AdaptiveError(
             f"Test script generation failed: {e}",
@@ -373,6 +386,15 @@ def interpret_failure_with_error_handling(user_prompt, failed_script, request_de
     """Interpret failure with error handling"""
     try:
         return interpret_failure(user_prompt, failed_script, request_details, failure_context_path)
+    except TimeoutError as e:
+        error = AdaptiveError(
+            f"Failure interpretation timed out: {e}",
+            ErrorType.CONSTRAINT_PARSING,
+            ErrorSeverity.MEDIUM,
+            context={'raw_response': failure_context_path, 'timeout': True}
+        )
+        recovery_result = error_handler.handle_error(error)
+        return recovery_result
     except Exception as e:
         error = AdaptiveError(
             f"Failure interpretation failed: {e}",

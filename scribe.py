@@ -5,28 +5,37 @@ import os
 import google.generativeai as genai
 import json
 import re
+import threading
+import time
 from typing import Dict, Any, Optional
 
-# Placeholder classes to allow standalone execution if constraint_model.py is not available.
-# For production, replace this section with your actual import:
-# from constraint_model import APIConstraintModel, LearnedConstraint
-class LearnedConstraint:
-    """A placeholder for the LearnedConstraint class."""
-    def __init__(self, rule_description, confidence_score, constraint_type, affected_parameter, endpoint_path, formal_constraint):
-        self.rule_description = rule_description
-        self.confidence_score = confidence_score
-        # Simulate an enum-like object for .value access
-        self.constraint_type = type('Enum', (), {'value': constraint_type})()
-        self.affected_parameter = affected_parameter
-        self.endpoint_path = endpoint_path
-        self.formal_constraint = formal_constraint
+# Import actual constraint model classes
+from constraint_model import APIConstraintModel, LearnedConstraint
 
-class APIConstraintModel:
-    """A placeholder for the APIConstraintModel class."""
-    def __init__(self):
-        self.learned_constraints = {}
-    def get_enhanced_schema(self):
-        return {}
+def llm_call_with_timeout(model, prompt, timeout=60):
+    """Call LLM with timeout using threading"""
+    result = [None]
+    exception = [None]
+    
+    def target():
+        try:
+            result[0] = model.generate_content(prompt)
+        except Exception as e:
+            exception[0] = e
+    
+    thread = threading.Thread(target=target)
+    thread.daemon = True
+    thread.start()
+    thread.join(timeout)
+    
+    if thread.is_alive():
+        # Thread is still running, timeout occurred
+        raise TimeoutError(f"LLM request timed out after {timeout} seconds")
+    
+    if exception[0]:
+        raise exception[0]
+    
+    return result[0]
 
 def _build_learned_rules_context(constraint_model: APIConstraintModel) -> str:
     """Build context string with learned constraints"""
@@ -112,7 +121,7 @@ def _complete_incomplete_script(incomplete_script: str, model) -> Optional[str]:
 """
     try:
         print("🔄 Attempting to complete the script...")
-        response = model.generate_content(completion_prompt)
+        response = llm_call_with_timeout(model, completion_prompt, 60)
         completed_script = _extract_code_from_response(response.text)
         
         validation = _validate_code_completeness(completed_script)
@@ -253,7 +262,7 @@ Now, generate the Python code for the user requirement. Return ONLY the raw Pyth
             "temperature": 0.1,
         }
         
-        response = model.generate_content(prompt, generation_config=generation_config)
+        response = llm_call_with_timeout(model, prompt, 90)  # 90 second timeout
         generated_script = _extract_code_from_response(response.text)
         
         validation_result = _validate_code_completeness(generated_script)

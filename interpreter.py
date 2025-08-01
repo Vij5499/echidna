@@ -3,6 +3,8 @@ load_dotenv()
 
 import os
 import google.generativeai as genai
+import threading
+import time
 from pydantic import BaseModel, Field
 from typing import Dict, Any, Optional, List, Union
 import json
@@ -11,6 +13,31 @@ from constraint_model import (
     LearnedConstraint, ConstraintType, ConditionalRule, 
     MutualExclusivityRule, FormatDependencyRule, BusinessRule, RateLimitRule
 )
+
+def llm_call_with_timeout(model, prompt, timeout=60):
+    """Call LLM with timeout using threading"""
+    result = [None]
+    exception = [None]
+    
+    def target():
+        try:
+            result[0] = model.generate_content(prompt)
+        except Exception as e:
+            exception[0] = e
+    
+    thread = threading.Thread(target=target)
+    thread.daemon = True
+    thread.start()
+    thread.join(timeout)
+    
+    if thread.is_alive():
+        # Thread is still running, timeout occurred
+        raise TimeoutError(f"LLM request timed out after {timeout} seconds")
+    
+    if exception[0]:
+        raise exception[0]
+    
+    return result[0]
 
 class EnhancedInferredRule(BaseModel):
     rule_description: str = Field(description="Clear description of the inferred API rule")
@@ -184,7 +211,7 @@ def interpret_failure(user_prompt: str, failed_script: str, request_details: Dic
     
     try:
         print("🤖 Sending enhanced prompt to Gemini...")
-        response = model.generate_content(prompt)
+        response = llm_call_with_timeout(model, prompt, 60)  # 60 second timeout
         
         print(f"🤖 LLM Response received ({len(response.text)} chars):")
         print("=" * 30)

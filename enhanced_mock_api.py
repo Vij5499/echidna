@@ -34,10 +34,10 @@ def create_user():
     if not data:
         return jsonify({"error": "Request body is required"}), 400
     
-    # Rate limiting check
-    if not check_rate_limit('/users', max_requests=3, window_seconds=60):
+    # Rate limiting check (more lenient for testing)
+    if not check_rate_limit('/users', max_requests=10, window_seconds=30):
         return jsonify({
-            "error": "Rate limit exceeded: maximum 3 requests per minute for user creation"
+            "error": "Rate limit exceeded: maximum 10 requests per 30 seconds for user creation"
         }), 429
     
     # Basic required fields
@@ -150,6 +150,54 @@ def create_order():
         "total_amount": data.get('total_amount', 0),
         "payment_method": data.get('payment_method', 'cash')
     }), 201
+
+@app.route('/products', methods=['POST'])
+def create_product():
+    """Product creation for format validation testing (no rate limits)"""
+    data = request.get_json()
+    
+    if not data:
+        return jsonify({"error": "Request body is required"}), 400
+    
+    # FORMAT VALIDATION: email format when contact_email provided
+    if 'contact_email' in data:
+        email = data.get('contact_email', '')
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            return jsonify({
+                "error": "contact_email must be a valid email format"
+            }), 400
+    
+    # Success case
+    new_product = {
+        "id": 789,
+        "name": data.get("name", "Default Product"),
+        "contact_email": data.get("contact_email"),
+        "created_at": "2025-08-01T10:00:00Z"
+    }
+    
+    return jsonify(new_product), 201
+
+@app.route('/profiles', methods=['POST'])  
+def create_profile():
+    """Profile creation for required field testing (no rate limits)"""
+    data = request.get_json()
+    
+    if not data:
+        return jsonify({"error": "Request body is required"}), 400
+    
+    # REQUIRED FIELD: username is required
+    if not data.get('username'):
+        return jsonify({"error": "username field is required"}), 400
+    
+    # Success case
+    new_profile = {
+        "id": 101,
+        "username": data.get("username"),
+        "bio": data.get("bio", ""),
+        "created_at": "2025-08-01T10:00:00Z"
+    }
+    
+    return jsonify(new_profile), 201
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

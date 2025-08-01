@@ -36,16 +36,18 @@ def api_base_url():
             with open('conftest.py', 'w') as f:
                 f.write(conftest_content)
         
-        # Execute the pytest script
+        # Execute the pytest script with proper encoding
         result = subprocess.run(
             ['python', '-m', 'pytest', script_file, '-v', '--tb=short'],
             capture_output=True,
             text=True,
-            timeout=30  # 30 second timeout
+            timeout=30,  # 30 second timeout
+            encoding='utf-8',  # Force UTF-8 encoding
+            errors='replace'   # Replace invalid characters instead of crashing
         )
         
-        # Write output to the temporary file
-        with open(output_file, 'w') as f:
+        # Write output to the temporary file with proper encoding
+        with open(output_file, 'w', encoding='utf-8', errors='replace') as f:
             f.write("=== PYTEST EXECUTION RESULTS ===\n")
             f.write(f"Return code: {result.returncode}\n")
             f.write("=== STDOUT ===\n")
@@ -67,7 +69,7 @@ def api_base_url():
         
     except subprocess.TimeoutExpired:
         # Handle timeout
-        with open(output_file, 'w') as f:
+        with open(output_file, 'w', encoding='utf-8', errors='replace') as f:
             f.write("=== TIMEOUT ERROR ===\n")
             f.write("Test execution timed out after 30 seconds\n")
         
@@ -81,7 +83,7 @@ def api_base_url():
         
     except Exception as e:
         # Handle other execution errors
-        with open(output_file, 'w') as f:
+        with open(output_file, 'w', encoding='utf-8', errors='replace') as f:
             f.write("=== EXECUTION ERROR ===\n")
             f.write(f"Error executing test: {str(e)}\n")
         
